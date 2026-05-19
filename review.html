@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leave a Review - Crumbssi</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      background: #f1bcd5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      padding: 40px 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(68,0,153,0.15);
+      width: 100%;
+      max-width: 480px;
+    }
+    .logo-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .logo-container img {
+      max-width: 160px;
+      height: auto;
+    }
+    h2 {
+      text-align: center;
+      color: #440099;
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      color: #440099;
+      font-weight: bold;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      border: 2px solid #f1bcd5;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      transition: border 0.2s;
+    }
+    input:focus, textarea:focus {
+      border-color: #440099;
+    }
+    .stars {
+      font-size: 36px;
+      text-align: center;
+      margin-bottom: 16px;
+      cursor: pointer;
+    }
+    .star { color: #ddd; transition: color 0.2s; }
+    .star.active { color: #FFD700; }
+    .stars-label {
+      text-align: center;
+      color: #440099;
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    button {
+      width: 100%;
+      padding: 13px;
+      background: #440099;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background: #5a00cc; }
+    #success-message {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 16px;
+      color: #440099;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo-container">
+      <img src="/logo.png"
+      alt="Crumbssi Logo" />
+    </div>
+    <h2>Leave a Review</h2>
+
+    <label>Your Name</label>
+    <input type="text" id="name" placeholder="Enter your name" />
+
+    <div class="stars-label">Your Rating</div>
+    <div class="stars">
+      <span class="star" onclick="setStars(1)">★</span>
+      <span class="star" onclick="setStars(2)">★</span>
+      <span class="star" onclick="setStars(3)">★</span>
+      <span class="star" onclick="setStars(4)">★</span>
+      <span class="star" onclick="setStars(5)">★</span>
+    </div>
+
+    <label>Your Experience</label>
+    <textarea id="message" rows="4"
+    placeholder="Tell us about your experience..."></textarea>
+
+    <button onclick="sendReview()">Submit Review</button>
+    <p id="success-message"></p>
+  </div>
+
+  <script>
+    let selectedStars = 0;
+    const id = window.location.pathname.split('/').pop();
+
+    function setStars(n) {
+      selectedStars = n;
+      document.querySelectorAll('.star').forEach((el, i) => {
+        el.classList.toggle('active', i < n);
+      });
+    }
+
+    async function sendReview() {
+      const name = document.getElementById('name').value;
+      const message = document.getElementById('message').value;
+
+      if (!name || !message || selectedStars === 0) {
+        alert('Please fill in all fields and select a star rating');
+        return;
+      }
+
+      const res = await fetch(`http://localhost:3000/review/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre: name,
+          mensaje: message,
+          estrellas: selectedStars
+        })
+      });
+
+      const data = await res.json();
+      document.getElementById('success-message').textContent =
+      'Thank you for your review! 🎉';
+    }
+  </script>
+</body>
+</html>
