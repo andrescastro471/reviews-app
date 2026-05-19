@@ -1,28 +1,27 @@
 const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
+const cors = require('cors');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
+app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
 let reviews = [];
 
-// Generar link unico
 app.post('/generar-link', (req, res) => {
-  const uniqueID = uuidv4();
-  const reviewLink = `http://localhost:3000/review/${uniqueID}`;
-  res.json({ link: reviewLink });
+  const id = uuidv4();
+  const link = `https://reviews-app-production-1d39.up.railway.app/review/${id}`;
+  res.json({ link });
 });
 
-// Servir el formulario cuando el cliente abre el link
 app.get('/review/:id', (req, res) => {
   res.sendFile(path.join(__dirname, 'review.html'));
 });
 
-// Recibir el review enviado
 app.post('/review/:id', (req, res) => {
   const { nombre, mensaje, estrellas } = req.body;
   const review = {
@@ -36,7 +35,6 @@ app.post('/review/:id', (req, res) => {
   res.json({ success: true, review });
 });
 
-// Ver todos los reviews
 app.get('/reviews', (req, res) => {
   res.json(reviews);
 });
